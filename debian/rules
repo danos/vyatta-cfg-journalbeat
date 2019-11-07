@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+SCRIPT_DIR=/opt/vyatta/sbin
+PYTHON_DIR=$(CURDIR)/debian/vyatta-journalbeat
+
+
+override_dh_installinit:
+	dh_installinit --name=journalbeat --no-scripts
+
+%:
+	dh $@ --with python3,yang

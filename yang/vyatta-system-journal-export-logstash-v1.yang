@@ -1,0 +1,140 @@
+module vyatta-system-journal-export-logstash-v1 {
+    namespace "urn:vyatta.com:mgmt:vyatta-system-journal-export-logstash:1";
+    prefix vyatta-system-journal-export-logstash-v1;
+
+    import configd-v1 {
+        prefix configd;
+    }
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    import vyatta-system-v1 {
+        prefix system;
+    }
+
+    import vyatta-system-journal-v1 {
+        prefix journal;
+    }
+
+    organization "AT&T Inc.";
+    contact
+        "AT&T
+         Postal: 208 S. Akard Street
+                 Dallas, TX  75202
+         Web:    www.att.com";
+
+    description
+        "Copyright (c) 2018-2019, AT&T Intellectual property.
+         All rights reserved.
+
+         Redistribution and use in source and binary forms, with or without
+         modification, are permitted provided that the following conditions are
+         met:
+
+             1. Redistributions of source code must retain the above copyright
+                notice, this list of conditions and the following disclaimer.
+             2. Redistributions in binary form must reproduce the above
+                copyright notice, this list of conditions and the following
+                disclaimer in the documentation and/or other materials provided
+                with the distribution.
+             3. Neither the name of the copyright holder nor the names of its
+                contributors may be used to endorse or promote products derived
+                from this software without specific prior written permission.
+
+         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+         'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+         LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+         A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+         HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+         SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+         LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+         DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+         THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+         OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+         SPDX-License-Identifier: BSD-3-Clause
+
+         ---
+
+         The YANG module for vyatta-system-journal-export-logstash-v1
+
+         YANG node defining the configuration parameters needed to establish a
+         connection to a Logstash endpoint, so that logs may be exported from
+         the Systemd Journal log system of this device to an off-site location.
+
+         Logstash is a server-side message broker/processing pipeline developed
+         by Elastic - the authors of Elasticsearch and Logstash - that acts as
+         an endpoint that can ingest messages from a number of sources and
+         process them into one of several different data stores each in a
+         variety of formats.
+        ";
+
+    revision 2019-07-31 {
+        description "Make logstash exporter a grouping.
+                     Update copyright year.
+                     Fix whitespace in previous revision's description.";
+    }
+
+    revision 2019-05-03 {
+        description "Fix unsafe use of quotes in 'index' pattern definition";
+    }
+
+    revision 2018-11-06 {
+        description "Add index leaf.";
+    }
+
+    revision 2018-03-13 {
+        description "Initial revision - v1";
+    }
+
+    grouping logstash {
+        container logstash {
+            presence "Enable export to Logstash";
+            configd:end "bash /opt/vyatta/sbin/journalbeat_cfg.sh";
+            configd:help "Logstash output/export config parameters";
+            description "Logstash output/export configuration parameters";
+            list endpoints {
+                key "endpoint";
+                min-elements 1;
+                leaf endpoint {
+                    configd:help "Endpoint descriptor";
+                    type string {
+                        length "1..255";
+                    }
+                }
+                configd:help "List of Logstash endpoints";
+                description "List of Logstash endpoints";
+                leaf hostname {
+                    description "Hostname/IP address of endpoint";
+                    configd:help "Hostname/IP address of endpoint";
+                    type union {
+                        type inet:domain-name;
+                        type inet:ip-address-no-zone;
+                    }
+                    mandatory true;
+                }
+                leaf port {
+                    description "Port number for Logstash process";
+                    configd:help "Port number for Logstash process";
+                    type inet:port-number;
+                }
+            }
+            leaf index {
+                configd:help "The index that Logstash should use";
+                description "The index that Logstash should use";
+                type string {
+                    length 1..64;
+                    pattern '[a-z0-9][-_+\.a-z0-9]*';
+                }
+                default logstash;
+            }
+        }
+    }
+
+    augment "/system:system/journal:journal/journal:export" {
+        uses logstash;
+    }
+}

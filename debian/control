@@ -1,0 +1,47 @@
+Source: vyatta-cfg-journalbeat
+Section: utils
+Priority: optional
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Standards-Version: 3.9.8
+Build-Depends: debhelper (>=10),
+  dh-python,
+  dh-yang,
+  python3-all,
+  python3-setuptools
+X-Python3-Version: >= 3.3
+
+Package: vyatta-cfg-journalbeat
+Architecture: all
+Depends: chvrf,
+  journalbeat (= 6.8.3-0vyatta2),
+  python3,
+  python3-configobj (>= 5.0.6),
+  python3-vrfmanager,
+  python3-vyatta-cfgclient,
+  python3-yaml,
+  ${misc:Depends},
+  ${python3:Depends}
+Description: Config scripts for Journalbeat in vRouter
+ The configuration scripts required to convert the Vyatta YANG Data Model
+ for Journalbeat into a YAML configuration format used by Journalbeat.
+
+Package: vyatta-system-journal-export-logstash-v1-yang
+Architecture: all
+Depends: vyatta-cfg-journalbeat,
+  vyatta-system-journal-v1-yang (>= 2.23.5),
+  ${misc:Depends},
+  ${yang:Depends}
+Description: YANG for Journalbeat in Vyatta vRouter
+ The YANG files defining the data model used to configure the install export
+ mechanism to ship logs from systemd-journal's message logging system, to the
+ configured Logstash endpoint.
+
+Package: vyatta-system-journal-export-logstash-routing-instance-v1-yang
+Architecture: all
+Depends: vyatta-system-journal-export-logstash-v1-yang,
+  ${misc:Depends},
+  ${yang:Depends}
+Description: YANG for Journalbeat in Vyatta vRouter
+ The YANG files defining the data model used to configure the install export
+ mechanism to ship logs from systemd-journal's message logging system, to the
+ configured Logstash endpoint.

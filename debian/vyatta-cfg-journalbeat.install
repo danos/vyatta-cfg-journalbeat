@@ -1,0 +1,2 @@
+config/journalbeat_cfg.py /opt/vyatta/sbin
+config/journalbeat_cfg.sh /opt/vyatta/sbin

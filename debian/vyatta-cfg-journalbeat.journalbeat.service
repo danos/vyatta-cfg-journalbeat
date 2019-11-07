@@ -1,0 +1,14 @@
+[Unit]
+Description=Export mechanism for journald logs to Elasticsearch
+After=network.target
+
+[Service]
+EnvironmentFile=/run/journalbeat/journalbeat.env
+ExecStart=/usr/sbin/chvrf $VRF /usr/bin/journalbeat -e -c /etc/journalbeat.yml -path.data /var/lib/journalbeat -path.home /var/lib/journalbeat
+WorkingDirectory=/var/lib/journalbeat
+Restart=on-failure
+RestartSec=10
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
